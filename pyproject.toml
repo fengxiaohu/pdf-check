@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-check"
+version = "0.1.0"
+description = "PDF scanner for LLM/AI-targeted instruction detection."
+requires-python = ">=3.10"
+dependencies = [
+  "flask>=3.0.0",
+  "pikepdf>=9.0.0",
+  "pypdf>=4.0.0",
+  "pyyaml>=6.0.0",
+  "reportlab>=4.0.0",
+]
+
+[project.scripts]
+pdf-check = "pdf_check.cli:main"
+pdf-sanitizer = "pdf_check.sanitizer_cli:main"

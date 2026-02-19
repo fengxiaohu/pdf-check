@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PDF Check Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}" />
+  </head>
+  <body>
+    <div class="bg-shape one"></div>
+    <div class="bg-shape two"></div>
+
+    <main class="shell">
+      <section class="hero">
+        <h1>PDF Security Scanner</h1>
+        <p>Upload one PDF and run static detection for hidden text, suspicious actions, and risky links.</p>
+      </section>
+
+      <section class="card upload">
+        <form action="/scan" method="post" enctype="multipart/form-data">
+          <label class="file-label" for="pdf">Select PDF</label>
+          <input id="pdf" name="pdf" type="file" accept="application/pdf,.pdf" required />
+
+          <div class="opts">
+            <label><input type="checkbox" name="strict" {% if scan_options and scan_options.strict %}checked{% endif %}/> Strict mode</label>
+            <label><input type="checkbox" name="verbose" {% if scan_options and scan_options.verbose %}checked{% endif %}/> Verbose output</label>
+          </div>
+
+          <button type="submit">Scan PDF</button>
+        </form>
+
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+      </section>
+
+      {% if report %}
+      <section class="card summary">
+        <h2>Scan Summary</h2>
+        <p class="meta">File: <strong>{{ uploaded_name }}</strong></p>
+        {% if download_token %}
+        <div class="download-actions">
+          <a class="dl-btn" href="{{ url_for('download_clean_markdown', token=download_token) }}">Download Clean Markdown</a>
+          <a class="dl-btn" href="{{ url_for('download_clean_pdf', token=download_token) }}">Download Clean PDF</a>
+        </div>
+        {% endif %}
+        <div class="stats">
+          <div><span>Total</span><b>{{ report.summary.total_risk_count }}</b></div>
+          <div><span>High</span><b>{{ report.summary.severity.high }}</b></div>
+          <div><span>Medium</span><b>{{ report.summary.severity.medium }}</b></div>
+          <div><span>Low</span><b>{{ report.summary.severity.low }}</b></div>
+        </div>
+      </section>
+
+      <section class="card findings">
+        <h2>Findings</h2>
+        {% if report.findings %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Severity</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Page</th>
+                  <th>Object</th>
+                  <th>Description</th>
+                  <th>Evidence</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for f in report.findings %}
+                <tr>
+                  <td>{{ f.id }}</td>
+                  <td><span class="sev {{ f.severity }}">{{ f.severity }}</span></td>
+                  <td>{{ f.category }}</td>
+                  <td>{{ f.type }}</td>
+                  <td>{{ f.page if f.page is not none else '-' }}</td>
+                  <td>{{ f.object_id if f.object_id is not none else '-' }}</td>
+                  <td>{{ f.description }}</td>
+                  <td class="evidence">{{ f.evidence }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p>No findings.</p>
+        {% endif %}
+      </section>
+      {% endif %}
+    </main>
+  </body>
+</html>

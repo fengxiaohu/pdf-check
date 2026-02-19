@@ -1,0 +1,6 @@
+pikepdf>=9.0.0
+pypdf>=4.0.0
+pyyaml>=6.0.0
+pytest>=8.0.0
+flask>=3.0.0
+reportlab>=4.0.0
